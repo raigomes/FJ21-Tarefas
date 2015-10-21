@@ -17,19 +17,43 @@ import br.com.caelum.tarefas.jdbc.modelo.Tarefa;
 public class TarefaDao {
 	private Connection connection;
 	private final String table = "tarefas";
+	private final String sequence = "tarefas_sequence";
 	
 	public TarefaDao(Connection connection) {
 		this.connection = connection;
 		
 		if (!hasTable()) {
-			createTable(this.table);
+			createSequence(this.sequence);
+			createTable(this.table, this.sequence);			
 		}
 				
 	} 
 	
-	private void createTable(String tableName) {
-		String query = "CREATE TABLE " + tableName +
-                "(id INTEGER not NULL, " +
+	private void createSequence(String sequenceName) {
+		String query = "CREATE SEQUENCE "+ sequenceName
+				+" INCREMENT 1 "
+				+" MINVALUE 1 "
+				+" MAXVALUE 9223372036854775807 "
+				+" START 1000 "
+				+" CACHE 1; "
+				+" ALTER TABLE contato_sequence OWNER TO postgres";
+		
+		try {
+			//Preparando statement
+			PreparedStatement stmt = connection.prepareStatement(query);
+			
+			//Executa e fecha statement
+			stmt.execute();
+			stmt.close();
+		}
+		catch(SQLException e) {
+			throw new DaoException("TarefaDao", "createSequence()", e);
+		}
+	}
+	
+	private void createTable(String tableName, String sequenceName) {
+		String query = "CREATE TABLE " + tableName + 
+                " (id BIGINT not NULL DEFAULT nextval('"+ sequenceName +"'::regclass), " +
                 " descricao VARCHAR(255), " + 
                 " finalizado BOOLEAN, " + 
                 " dataFinalizacao DATE, " + 
@@ -42,8 +66,6 @@ public class TarefaDao {
 			//Executa e fecha statement
 			stmt.execute();
 			stmt.close();
-			
-			connection.close();
 		}
 		catch(SQLException e) {
 			throw new DaoException("TarefaDao", "createTable()", e);
