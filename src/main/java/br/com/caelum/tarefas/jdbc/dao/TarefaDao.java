@@ -1,6 +1,7 @@
 package br.com.caelum.tarefas.jdbc.dao;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,14 +16,57 @@ import br.com.caelum.tarefas.jdbc.modelo.Tarefa;
 
 public class TarefaDao {
 	private Connection connection;
+	private final String table = "tarefas";
 	
 	public TarefaDao(Connection connection) {
 		this.connection = connection;
-	}
+		
+		if (!hasTable()) {
+			createTable(this.table);
+		}
+				
+	} 
 	
+	private void createTable(String tableName) {
+		String query = "CREATE TABLE " + tableName +
+                "(id INTEGER not NULL, " +
+                " descricao VARCHAR(255), " + 
+                " finalizado BOOLEAN, " + 
+                " dataFinalizacao DATE, " + 
+                " PRIMARY KEY ( id ))";
+		
+		try {
+			//Preparando statement
+			PreparedStatement stmt = connection.prepareStatement(query);
+			
+			//Executa e fecha statement
+			stmt.execute();
+			stmt.close();
+			
+			connection.close();
+		}
+		catch(SQLException e) {
+			throw new DaoException("TarefaDao", "createTable()", e);
+		}
+	}
+
+	private boolean hasTable() {
+		try {
+			DatabaseMetaData dbm = this.connection.getMetaData();
+			ResultSet tables = dbm.getTables(null, null, this.table, null);
+			if(tables.next()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
 	public void adiciona(Tarefa tarefa) {
 		
-		String query = "insert into tarefas"
+		String query = "insert into " + table
 				+ "(descricao, finalizado, dataFinalizacao)" 
 				+ "values (?, ?, ?)";
 		
@@ -54,7 +98,7 @@ public class TarefaDao {
 		try {
 			List<Tarefa> tarefas = new ArrayList<>();
 			//Prepara Statement com a query SELECT e executa-a, gurardando o resultado num ResultSet
-			String query = "select * from tarefas";
+			String query = "select * from " + table;
 			PreparedStatement stmt = this.connection.prepareStatement(query);
 			ResultSet rs  = stmt.executeQuery();
 			
@@ -96,7 +140,9 @@ public class TarefaDao {
 	
 	public Tarefa pesquisar(int id) {
 		try {			
-			String query = "select * from tarefas where id = ?";
+			String query = "select *"
+					+ " from " + table
+					+ " where id = ?";
 			PreparedStatement stmt = connection.prepareStatement(query);
 			stmt.setLong(1, id);
 			ResultSet rs = stmt.executeQuery();
@@ -128,9 +174,9 @@ public class TarefaDao {
 	}
 	
 	public boolean altera (Tarefa tarefa) {
-		String query = "update tarefas "
-				+ "set descricao = ?, finalizado = ?, dataFinalizacao = ? "
-				+ "where id = ?";
+		String query = "update " + table
+				+ " set descricao = ?, finalizado = ?, dataFinalizacao = ?"
+				+ " where id = ?";
 		
 		try {
 			PreparedStatement stmt = connection.prepareStatement(query);
@@ -156,7 +202,8 @@ public class TarefaDao {
 	}
 	
 	public boolean remove(long id) {
-		String query = "delete from tarefas where id = ?";
+		String query = "delete from "+ table
+					+" where id = ?";
 		
 		try {
 			PreparedStatement stmt = connection.prepareStatement(query);
