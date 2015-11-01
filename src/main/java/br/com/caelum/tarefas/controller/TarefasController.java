@@ -1,6 +1,7 @@
 package br.com.caelum.tarefas.controller;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,7 @@ public class TarefasController {
 		
 		TarefaDao dao = new TarefaDao(connection);
 		dao.adiciona(tarefa);
-		
+				
 		return "tarefa/adicionada";
 	}
 }

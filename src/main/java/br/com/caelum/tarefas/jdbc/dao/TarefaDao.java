@@ -118,7 +118,7 @@ public class TarefaDao {
 	
 	public List<Tarefa> getLista() {
 		try {
-			List<Tarefa> tarefas = new ArrayList<>();
+			List<Tarefa> tarefas = new ArrayList<Tarefa>();
 			//Prepara Statement com a query SELECT e executa-a, gurardando o resultado num ResultSet
 			String query = "select * from " + table;
 			PreparedStatement stmt = this.connection.prepareStatement(query);
