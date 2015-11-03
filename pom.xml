@@ -79,6 +79,12 @@
 		<artifactId>jboss-logging</artifactId>
 		<version>3.3.0.Final</version>
 	</dependency>
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>jstl</artifactId>
+		<version>1.2</version>
+		<scope>runtime</scope>
+	</dependency>
   </dependencies>
   <build>
     <finalName>fj21-tarefa</finalName>

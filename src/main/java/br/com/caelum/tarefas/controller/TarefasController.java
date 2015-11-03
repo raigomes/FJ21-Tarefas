@@ -3,7 +3,10 @@ package br.com.caelum.tarefas.controller;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import br.com.caelum.tarefas.jdbc.ConnectionFactory;
@@ -19,7 +22,12 @@ public class TarefasController {
 	}
 	
 	@RequestMapping("adicionaTarefa")
-	public String adiciona(Tarefa tarefa) {
+	public String adiciona(@Valid Tarefa tarefa, BindingResult result) {
+		
+		if(result.hasFieldErrors("descricao")) {
+			return "tarefa/formulario";
+		}
+		
 		Connection connection = new ConnectionFactory().getConnection();		
 		
 		TarefaDao dao = new TarefaDao(connection);

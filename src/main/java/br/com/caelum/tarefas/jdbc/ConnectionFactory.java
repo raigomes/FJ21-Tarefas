@@ -10,7 +10,7 @@ public class ConnectionFactory {
 			String driver = "jdbc:postgresql://localhost:5432/fj21";
 			return DriverManager.getConnection(driver, "postgres", "postgres");
 		}
-		catch(SQLException | ClassNotFoundException e) {
+		catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
