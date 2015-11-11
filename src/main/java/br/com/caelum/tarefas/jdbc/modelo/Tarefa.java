@@ -8,7 +8,8 @@ import javax.validation.constraints.Size;
 public class Tarefa {
 	private long id;
 	
-	@NotNull @Size(min=5)
+	@NotNull (message="{tarefa.descricao.vazia}") 
+	@Size(min=5, message="{tarefa.descricao.pequena}")
 	private String descricao;
 	
 	private boolean finalizado;
